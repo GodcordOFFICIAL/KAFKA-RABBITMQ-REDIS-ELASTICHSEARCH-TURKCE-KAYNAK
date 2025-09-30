@@ -29,6 +29,7 @@ Bu repository, **Kafka**, **RabbitMQ**, **Redis** ve **Elasticsearch** teknoloji
 │   ├── 02-rabbitmq/               # RabbitMQ bölümü
 │   ├── 03-redis/                  # Redis bölümü
 │   ├── 04-elasticsearch/          # Elasticsearch bölümü
+│   ├── 05-integration/            # Integration örnekleri
 │   └── 99-appendices/             # Ekler (glossary, cheatsheets, troubleshooting)
 ├── examples/                      # Kod örnekleri
 │   ├── kafka/                     # Kafka kod örnekleri
