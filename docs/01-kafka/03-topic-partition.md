@@ -5,6 +5,7 @@
 ## 🎯 Learning Objectives
 
 Bu bölümü tamamladığınızda:
+
 - [x] Topic ve partition tasarım prensiplerini anlayacaksınız
 - [x] Optimal partition sayısını belirleyebileceksiniz
 - [x] Replication ve fault tolerance stratejilerini uygulayabileceksiniz
@@ -39,6 +40,7 @@ Bu bölümü tamamladığınızda:
 ```
 
 **Yapılan İşlemler**:
+
 - **Environment Separation**: Environment prefix ile ayrım
 - **Domain Classification**: Business domain grouping
 - **Entity Identification**: Clear entity naming
@@ -52,12 +54,12 @@ graph TD
     A --> C[Consumer Parallelism]
     A --> D[Ordering Requirements]
     A --> E[Key Distribution]
-    
+
     B --> F[Target: 10MB/s per partition]
     C --> G[Max consumers = partition count]
     D --> H[Same key = same partition]
     E --> I[Avoid hot partitions]
-    
+
     F --> J[Calculate total partitions]
     G --> J
     H --> J
@@ -65,6 +67,7 @@ graph TD
 ```
 
 **Partition Sayısı Belirleme Formülü**:
+
 ```
 Partition Count = max(
     Target Throughput / Partition Throughput,
@@ -100,6 +103,7 @@ docker exec -it kafka1 kafka-topics.sh \
 ```
 
 **Yapılan İşlemler**:
+
 - **Partition Count**: Parallelism ve throughput gereksinimlerine göre
 - **Replication Factor**: Fault tolerance seviyesi
 - **Retention**: Data retention süresi (7 gün = 604800000 ms)
@@ -157,6 +161,7 @@ docker exec -it kafka1 kafka-configs.sh \
 ```
 
 **Yapılan İşlemler**:
+
 - **Partition Scaling**: Sadece artırma mümkün
 - **Dynamic Config**: Runtime configuration changes
 - **Config Removal**: Default değerlere dönme
@@ -173,14 +178,14 @@ docker exec -it kafka1 kafka-configs.sh \
  * Kullanım: User events, order processing, session management
  */
 public class KeyBasedPartitioning {
-    
+
     public void sendUserEvent(String userId, UserEvent event) {
         // User ID key olarak kullanılır - aynı user aynı partition'a gider
-        ProducerRecord<String, UserEvent> record = 
+        ProducerRecord<String, UserEvent> record =
             new ProducerRecord<>("user-events", userId, event);
-        
+
         producer.send(record);
-        
+
         // Garantiler:
         // - Aynı user'ın event'leri sıralı işlenir
         // - Session consistency sağlanır
@@ -197,14 +202,14 @@ public class KeyBasedPartitioning {
  * Kullanım: Key'i olmayan mesajlar, log aggregation
  */
 public class RoundRobinPartitioning {
-    
+
     public void sendLogEntry(LogEntry logEntry) {
         // Key null olduğu için round-robin dağılım
-        ProducerRecord<String, LogEntry> record = 
+        ProducerRecord<String, LogEntry> record =
             new ProducerRecord<>("application-logs", null, logEntry);
-        
+
         producer.send(record);
-        
+
         // Avantajlar:
         // - Equal distribution across partitions
         // - Maximum throughput
@@ -220,16 +225,16 @@ public class RoundRobinPartitioning {
  * Custom partitioner - Business logic based routing
  */
 public class BusinessLogicPartitioner implements Partitioner {
-    
+
     @Override
-    public int partition(String topic, Object key, byte[] keyBytes, 
+    public int partition(String topic, Object key, byte[] keyBytes,
                         Object value, byte[] valueBytes, Cluster cluster) {
-        
+
         int numPartitions = cluster.partitionCountForTopic(topic);
-        
+
         if (key != null) {
             String keyString = key.toString();
-            
+
             // Priority-based partitioning
             if (keyString.startsWith("priority_high_")) {
                 // High priority messages to first 25% of partitions
@@ -244,19 +249,20 @@ public class BusinessLogicPartitioner implements Partitioner {
                 return startPartition + (Math.abs(keyString.hashCode()) % (numPartitions / 2));
             }
         }
-        
+
         return (int) (Math.random() * numPartitions);
     }
-    
+
     @Override
     public void close() {}
-    
+
     @Override
     public void configure(Map<String, ?> configs) {}
 }
 ```
 
 **Yapılan İşlemler**:
+
 - **Priority Routing**: İş önceliğine göre partition assignment
 - **Load Segregation**: Farklı workload'ları ayrı partition'lara
 - **Resource Allocation**: Consumer resource'larını optimize etme
@@ -322,6 +328,7 @@ docker exec -it kafka1 kafka-configs.sh \
 ```
 
 **Yapılan İşlemler**:
+
 - **Delete Policy**: Time/size-based deletion
 - **Compact Policy**: Key-based latest value retention
 - **Hybrid Policy**: Both strategies combined
@@ -359,6 +366,7 @@ docker exec -it kafka1 kafka-configs.sh \
 ```
 
 **Mimari Açıklamalar**:
+
 - **Segment Size**: Büyük segment = daha az file handle, daha uzun failover
 - **Compression**: CPU vs storage/network trade-off
 - **Min ISR**: Availability vs consistency trade-off
@@ -382,10 +390,10 @@ class TopicMonitor:
     """
     Kafka topic monitoring ve health check utility
     """
-    
+
     def __init__(self, bootstrap_servers: str = "localhost:9092"):
         self.bootstrap_servers = bootstrap_servers
-    
+
     def get_topic_list(self) -> List[str]:
         """Tüm topic'leri listele"""
         try:
@@ -393,15 +401,15 @@ class TopicMonitor:
                 "docker", "exec", "-it", "kafka1", "kafka-topics.sh",
                 "--list", "--bootstrap-server", self.bootstrap_servers
             ]
-            
+
             result = subprocess.run(cmd, capture_output=True, text=True)
             topics = [topic.strip() for topic in result.stdout.split('\n') if topic.strip()]
-            
+
             return topics
         except Exception as e:
             print(f"❌ Error getting topic list: {e}")
             return []
-    
+
     def get_topic_details(self, topic: str) -> Dict[str, Any]:
         """Topic detaylarını al"""
         try:
@@ -410,13 +418,13 @@ class TopicMonitor:
                 "--describe", "--bootstrap-server", self.bootstrap_servers,
                 "--topic", topic
             ]
-            
+
             result = subprocess.run(cmd, capture_output=True, text=True)
-            
+
             # Parse output to extract topic information
             lines = result.stdout.strip().split('\n')
             topic_info = {"name": topic, "partitions": [], "configs": {}}
-            
+
             for line in lines:
                 if line.startswith(f"Topic: {topic}"):
                     # Extract partition count and replication factor
@@ -441,15 +449,15 @@ class TopicMonitor:
                         elif part == "Isr:":
                             isr_str = parts[i+1]
                             partition_info["isr"] = [int(r) for r in isr_str.split(',')]
-                    
+
                     topic_info["partitions"].append(partition_info)
-            
+
             return topic_info
-            
+
         except Exception as e:
             print(f"❌ Error getting topic details for {topic}: {e}")
             return {}
-    
+
     def get_topic_configs(self, topic: str) -> Dict[str, str]:
         """Topic configuration'larını al"""
         try:
@@ -460,10 +468,10 @@ class TopicMonitor:
                 "--entity-name", topic,
                 "--describe"
             ]
-            
+
             result = subprocess.run(cmd, capture_output=True, text=True)
             configs = {}
-            
+
             # Parse configurations
             lines = result.stdout.strip().split('\n')
             for line in lines:
@@ -474,13 +482,13 @@ class TopicMonitor:
                         key = parts[0].strip()
                         value = parts[1].strip()
                         configs[key] = value
-            
+
             return configs
-            
+
         except Exception as e:
             print(f"❌ Error getting topic configs for {topic}: {e}")
             return {}
-    
+
     def check_topic_health(self, topic: str) -> Dict[str, Any]:
         """Topic health check"""
         health = {
@@ -489,29 +497,29 @@ class TopicMonitor:
             "issues": [],
             "recommendations": []
         }
-        
+
         try:
             # Get topic details
             details = self.get_topic_details(topic)
             configs = self.get_topic_configs(topic)
-            
+
             if not details:
                 health["healthy"] = False
                 health["issues"].append("Topic details could not be retrieved")
                 return health
-            
+
             # Check replication factor
             rf = details.get("replication_factor", 0)
             if rf < 3:
                 health["issues"].append(f"Low replication factor: {rf}")
                 health["recommendations"].append("Consider increasing replication factor to 3 for production")
-            
+
             # Check partition count
             partition_count = details.get("partition_count", 0)
             if partition_count == 1:
                 health["issues"].append("Single partition - no parallelism")
                 health["recommendations"].append("Consider increasing partition count for better throughput")
-            
+
             # Check for under-replicated partitions
             under_replicated = []
             for partition in details.get("partitions", []):
@@ -519,39 +527,39 @@ class TopicMonitor:
                 isr = partition.get("isr", [])
                 if len(isr) < len(replicas):
                     under_replicated.append(partition["id"])
-            
+
             if under_replicated:
                 health["healthy"] = False
                 health["issues"].append(f"Under-replicated partitions: {under_replicated}")
                 health["recommendations"].append("Check broker health and network connectivity")
-            
+
             # Check retention settings
             retention_ms = configs.get("retention.ms", "604800000")  # Default 7 days
             retention_days = int(retention_ms) / (1000 * 60 * 60 * 24)
-            
+
             if retention_days > 30:
                 health["issues"].append(f"Long retention period: {retention_days:.1f} days")
                 health["recommendations"].append("Consider reducing retention period to save storage")
-            
+
             # Update overall health
             if health["issues"]:
-                health["healthy"] = len([issue for issue in health["issues"] 
+                health["healthy"] = len([issue for issue in health["issues"]
                                       if "Under-replicated" in issue]) == 0
-            
+
             health["summary"] = {
                 "partition_count": partition_count,
                 "replication_factor": rf,
                 "under_replicated_partitions": len(under_replicated),
                 "retention_days": retention_days
             }
-            
+
             return health
-            
+
         except Exception as e:
             health["healthy"] = False
             health["issues"].append(f"Health check failed: {e}")
             return health
-    
+
     def generate_health_report(self) -> Dict[str, Any]:
         """Tüm topic'ler için health report oluştur"""
         report = {
@@ -564,36 +572,36 @@ class TopicMonitor:
                 "critical_issues": 0
             }
         }
-        
+
         topics = self.get_topic_list()
-        
+
         for topic in topics:
             if topic.startswith('_'):  # Skip internal topics
                 continue
-                
+
             health = self.check_topic_health(topic)
             report["topics"][topic] = health
-            
+
             report["summary"]["total_topics"] += 1
-            
+
             if health["healthy"]:
                 report["summary"]["healthy_topics"] += 1
             else:
                 report["summary"]["topics_with_issues"] += 1
-                
+
                 # Count critical issues
                 critical_keywords = ["Under-replicated", "could not be retrieved"]
                 for issue in health["issues"]:
                     if any(keyword in issue for keyword in critical_keywords):
                         report["summary"]["critical_issues"] += 1
                         break
-        
+
         return report
-    
+
     def print_health_report(self):
         """Health report'u console'a yazdır"""
         report = self.generate_health_report()
-        
+
         print("📊 Kafka Topic Health Report")
         print("=" * 50)
         print(f"🕐 Timestamp: {report['timestamp']}")
@@ -602,27 +610,27 @@ class TopicMonitor:
         print(f"⚠️ Topics with Issues: {report['summary']['topics_with_issues']}")
         print(f"❌ Critical Issues: {report['summary']['critical_issues']}")
         print()
-        
+
         for topic_name, health in report["topics"].items():
             status_icon = "✅" if health["healthy"] else "❌"
             print(f"{status_icon} Topic: {topic_name}")
-            
+
             if health.get("summary"):
                 summary = health["summary"]
                 print(f"   📊 Partitions: {summary['partition_count']}")
                 print(f"   🔄 Replication Factor: {summary['replication_factor']}")
                 print(f"   📅 Retention: {summary['retention_days']:.1f} days")
-            
+
             if health["issues"]:
                 print(f"   ⚠️ Issues:")
                 for issue in health["issues"]:
                     print(f"      - {issue}")
-            
+
             if health["recommendations"]:
                 print(f"   💡 Recommendations:")
                 for rec in health["recommendations"]:
                     print(f"      - {rec}")
-            
+
             print()
 
 # Test usage
@@ -672,12 +680,12 @@ create_topic() {
     local partitions=${2:-6}
     local replication_factor=${3:-1}
     local retention_days=${4:-7}
-    
+
     print_info "Creating topic: $topic_name"
     print_info "Partitions: $partitions, Replication: $replication_factor, Retention: $retention_days days"
-    
+
     local retention_ms=$((retention_days * 24 * 60 * 60 * 1000))
-    
+
     docker exec -it $KAFKA_CONTAINER kafka-topics.sh \
         --create \
         --bootstrap-server $BOOTSTRAP_SERVERS \
@@ -688,7 +696,7 @@ create_topic() {
         --config segment.ms=86400000 \
         --config compression.type=gzip \
         --config cleanup.policy=delete
-    
+
     if [ $? -eq 0 ]; then
         print_success "Topic $topic_name created successfully"
     else
@@ -699,16 +707,16 @@ create_topic() {
 # Delete topic
 delete_topic() {
     local topic_name=$1
-    
+
     print_warning "Deleting topic: $topic_name"
     read -p "Are you sure? (y/N): " confirm
-    
+
     if [[ $confirm == [yY] ]]; then
         docker exec -it $KAFKA_CONTAINER kafka-topics.sh \
             --delete \
             --bootstrap-server $BOOTSTRAP_SERVERS \
             --topic $topic_name
-        
+
         if [ $? -eq 0 ]; then
             print_success "Topic $topic_name deleted successfully"
         else
@@ -723,15 +731,15 @@ delete_topic() {
 scale_topic() {
     local topic_name=$1
     local new_partition_count=$2
-    
+
     print_info "Scaling topic $topic_name to $new_partition_count partitions"
-    
+
     docker exec -it $KAFKA_CONTAINER kafka-topics.sh \
         --alter \
         --bootstrap-server $BOOTSTRAP_SERVERS \
         --topic $topic_name \
         --partitions $new_partition_count
-    
+
     if [ $? -eq 0 ]; then
         print_success "Topic $topic_name scaled to $new_partition_count partitions"
     else
@@ -742,14 +750,14 @@ scale_topic() {
 # Show topic details
 describe_topic() {
     local topic_name=$1
-    
+
     print_info "Topic details for: $topic_name"
-    
+
     docker exec -it $KAFKA_CONTAINER kafka-topics.sh \
         --describe \
         --bootstrap-server $BOOTSTRAP_SERVERS \
         --topic $topic_name
-    
+
     print_info "Topic configurations:"
     docker exec -it $KAFKA_CONTAINER kafka-configs.sh \
         --bootstrap-server $BOOTSTRAP_SERVERS \
@@ -761,7 +769,7 @@ describe_topic() {
 # List all topics
 list_topics() {
     print_info "Listing all topics:"
-    
+
     docker exec -it $KAFKA_CONTAINER kafka-topics.sh \
         --list \
         --bootstrap-server $BOOTSTRAP_SERVERS
@@ -770,32 +778,32 @@ list_topics() {
 # Optimize topic for high throughput
 optimize_for_throughput() {
     local topic_name=$1
-    
+
     print_info "Optimizing topic $topic_name for high throughput"
-    
+
     docker exec -it $KAFKA_CONTAINER kafka-configs.sh \
         --bootstrap-server $BOOTSTRAP_SERVERS \
         --entity-type topics \
         --entity-name $topic_name \
         --alter \
         --add-config segment.ms=3600000,segment.bytes=134217728,compression.type=lz4
-    
+
     print_success "Topic $topic_name optimized for throughput"
 }
 
 # Optimize topic for low latency
 optimize_for_latency() {
     local topic_name=$1
-    
+
     print_info "Optimizing topic $topic_name for low latency"
-    
+
     docker exec -it $KAFKA_CONTAINER kafka-configs.sh \
         --bootstrap-server $BOOTSTRAP_SERVERS \
         --entity-type topics \
         --entity-name $topic_name \
         --alter \
         --add-config segment.ms=600000,compression.type=uncompressed,flush.ms=100
-    
+
     print_success "Topic $topic_name optimized for latency"
 }
 
@@ -841,7 +849,9 @@ esac
 ## 🎯 Hands-on Lab: E-commerce Topic Design
 
 ### Lab Hedefi
+
 Bir e-commerce platformu için optimal topic design'ı oluşturacağız:
+
 - **Order Processing Pipeline**: Sipariş akışı topic'leri
 - **User Activity Tracking**: Kullanıcı davranış analizi
 - **Inventory Management**: Stok takip sistemi
@@ -897,34 +907,34 @@ import time
 
 def monitor_ecommerce_topics():
     monitor = TopicMonitor()
-    
+
     ecommerce_topics = [
         'ecommerce.orders.created',
-        'ecommerce.orders.updated', 
+        'ecommerce.orders.updated',
         'ecommerce.user.page-views',
         'ecommerce.inventory.updates',
         'ecommerce.notifications.email'
     ]
-    
+
     while True:
         print("\n" + "="*60)
         print("🛒 E-commerce Topic Health Monitor")
         print("="*60)
-        
+
         for topic in ecommerce_topics:
             health = monitor.check_topic_health(topic)
             status = "✅" if health["healthy"] else "❌"
             print(f"{status} {topic}")
-            
+
             if health.get("summary"):
                 summary = health["summary"]
                 print(f"   Partitions: {summary['partition_count']}")
                 print(f"   Retention: {summary['retention_days']:.1f} days")
-            
+
             if health["issues"]:
                 for issue in health["issues"][:2]:  # Show first 2 issues
                     print(f"   ⚠️ {issue}")
-        
+
         time.sleep(30)  # Check every 30 seconds
 
 if __name__ == "__main__":
@@ -934,6 +944,7 @@ if __name__ == "__main__":
 ## ✅ Checklist - Topic & Partition Management
 
 ### Design Beceriler
+
 - [ ] Topic naming convention'larını uygulayabiliyorum
 - [ ] Optimal partition sayısını hesaplayabiliyorum
 - [ ] Replication factor'ı business requirement'lara göre belirleyebiliyorum
@@ -941,6 +952,7 @@ if __name__ == "__main__":
 - [ ] Custom partitioning stratejileri yazabiliyorum
 
 ### Operational Beceriler
+
 - [ ] Topic oluşturma, güncelleme ve silme işlemlerini yapabiliyorum
 - [ ] Dynamic configuration changes uygulayabiliyorum
 - [ ] Topic health monitoring yapabiliyorum
@@ -948,6 +960,7 @@ if __name__ == "__main__":
 - [ ] Capacity planning yapabiliyorum
 
 ### Troubleshooting Beceriler
+
 - [ ] Under-replicated partition'ları tespit edebiliyorum
 - [ ] Hot partition problemlerini çözebiliyorum
 - [ ] Storage ve retention problemlerini analiz edebiliyorum
@@ -956,6 +969,7 @@ if __name__ == "__main__":
 ## 🚫 Common Mistakes ve Çözümleri
 
 ### 1. **Partition Count Too Low**
+
 ```bash
 # Problem: Single partition bottleneck
 # Solution: Scale partitions based on throughput
@@ -969,6 +983,7 @@ required_partitions=$((target_throughput / partition_throughput))
 ```
 
 ### 2. **Inappropriate Retention**
+
 ```bash
 # Problem: Too long retention causing storage issues
 # Solution: Adjust retention based on business needs
@@ -982,6 +997,7 @@ docker exec -it kafka1 kafka-configs.sh \
 ```
 
 ### 3. **Wrong Cleanup Policy**
+
 ```bash
 # Problem: Using delete policy for user profiles
 # Solution: Use compact policy for state data
@@ -995,6 +1011,7 @@ docker exec -it kafka1 kafka-configs.sh \
 ```
 
 ### 4. **Missing Compression**
+
 ```bash
 # Problem: High network and storage usage
 # Solution: Enable appropriate compression
@@ -1012,11 +1029,13 @@ docker exec -it kafka1 kafka-configs.sh \
 ### Lab Çözümü İpuçları
 
 1. **Topic Not Created**:
+
    - Bootstrap server adresini kontrol edin
    - Kafka container'ın çalıştığından emin olun
    - Topic adında özel karakterler kullanmayın
 
 2. **Partition Count Error**:
+
    - Partition sayısı sadece artırılabilir, azaltılamaz
    - Consumer count'tan fazla partition kullanın
 

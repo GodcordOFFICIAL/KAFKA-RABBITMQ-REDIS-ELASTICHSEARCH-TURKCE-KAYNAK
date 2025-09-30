@@ -5,8 +5,9 @@
 ## 🎯 Learning Objectives
 
 Bu bölümü tamamladığınızda:
+
 - [x] Kafka'nın mimari yapısını ve bileşenlerini anlayacaksınız
-- [x] Topic, Partition, Broker, Consumer Group kavramlarını kavrayacaksınız  
+- [x] Topic, Partition, Broker, Consumer Group kavramlarını kavrayacaksınız
 - [x] Event streaming vs traditional messaging arasındaki farkları bileceksiniz
 - [x] Kafka cluster'ı kurabilecek ve yönetebileceksiniz
 - [x] Kafka CLI araçlarını kullanabileceksiniz
@@ -20,7 +21,7 @@ Bu bölümü tamamladığınızda:
 
 ## 📖 Kafka Nedir?
 
-Apache Kafka, **distributed event streaming platform** olarak tanımlanan, yüksek throughput ve low latency gereksinimleri için tasarlanmış bir sistemdir. 
+Apache Kafka, **distributed event streaming platform** olarak tanımlanan, yüksek throughput ve low latency gereksinimleri için tasarlanmış bir sistemdir.
 
 ### Geleneksel Mesajlaşma vs Event Streaming
 
@@ -31,7 +32,7 @@ graph LR
         B --> C[Consumer]
         B -.-> D[Message Consumed & Deleted]
     end
-    
+
     subgraph "Kafka Event Streaming"
         E[Producer] --> F[Topic/Log]
         F --> G[Consumer Group 1]
@@ -42,6 +43,7 @@ graph LR
 ```
 
 **Temel Farklar**:
+
 - **Message Queue**: Mesaj consume edildiğinde silinir
 - **Event Streaming**: Events belirli süre boyunca saklanır ve birden çok consumer tarafından okunabilir
 
@@ -73,28 +75,33 @@ graph LR
 ```
 
 #### 1. **Broker**
+
 - Kafka server'ı (process)
 - Topic partition'larını saklar
 - Producer ve consumer isteklerini handle eder
 - Cluster içinde unique ID'ye sahiptir
 
-#### 2. **Topic** 
+#### 2. **Topic**
+
 - Event'lerin kategorize edildiği log'lar
 - Database'deki tablo gibi düşünülebilir
 - Immutable event sequence'ı
 
 #### 3. **Partition**
+
 - Topic'lerin alt bölümleri
 - Paralel processing için kullanılır
 - Her partition ordered event sequence'ı
 - Leader/Follower replikasyon modeli
 
 #### 4. **Producer**
+
 - Topic'lere event gönderen uygulamalar
 - Partitioning strategy belirler
 - Ack policy ile delivery guarantee'i kontrol eder
 
 #### 5. **Consumer**
+
 - Topic'lerden event okuyan uygulamalar
 - Consumer group içinde organize olur
 - Offset ile position'ı track eder
@@ -102,14 +109,15 @@ graph LR
 ## 🔧 Kafka Kurulumu - Docker Compose
 
 ### Yapılan İşlemler:
+
 1. **Zookeeper kurulumu** - Kafka cluster coordination için
-2. **Kafka broker kurulumu** - Event storage ve processing için  
+2. **Kafka broker kurulumu** - Event storage ve processing için
 3. **Kafka UI kurulumu** - Web-based yönetim arayüzü için
 
 **Dosya**: `deployment/docker-compose/kafka-cluster.yml`
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   # Zookeeper - Kafka cluster coordination için gerekli
@@ -118,7 +126,7 @@ services:
     hostname: zookeeper
     container_name: zookeeper
     ports:
-      - "2181:2181"  # Client connections için port
+      - "2181:2181" # Client connections için port
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -135,32 +143,32 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - "9092:9092"   # External clients için
-      - "9997:9997"   # JMX monitoring için
+      - "9092:9092" # External clients için
+      - "9997:9997" # JMX monitoring için
     environment:
       # Broker temel yapılandırması
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+
       # Network yapılandırması - İÇ ve DIŞ bağlantılar için
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      
+
       # Replication ve partition yapılandırması
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      
+
       # Performance tuning
       KAFKA_NUM_NETWORK_THREADS: 8
       KAFKA_NUM_IO_THREADS: 8
       KAFKA_SOCKET_SEND_BUFFER_BYTES: 102400
       KAFKA_SOCKET_RECEIVE_BUFFER_BYTES: 102400
       KAFKA_SOCKET_REQUEST_MAX_BYTES: 104857600
-      
+
       # JMX Monitoring
       KAFKA_JMX_PORT: 9997
       KAFKA_JMX_HOSTNAME: localhost
@@ -174,33 +182,37 @@ services:
     depends_on:
       - kafka1
     ports:
-      - "8080:8080"   # Web UI port
+      - "8080:8080" # Web UI port
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka1:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
-      DYNAMIC_CONFIG_ENABLED: 'true'  # Runtime yapılandırma değişiklikleri için
+      DYNAMIC_CONFIG_ENABLED: "true" # Runtime yapılandırma değişiklikleri için
 
 volumes:
   zookeeper-data:
-  zookeeper-logs: 
+  zookeeper-logs:
   kafka1-data:
 ```
 
 ### Mimari Açıklamalar:
 
 #### **Network Yapılandırması**
+
 ```yaml
 KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://localhost:9092
 ```
+
 - **PLAINTEXT://kafka1:29092**: Container'lar arası iletişim
 - **PLAINTEXT_HOST://localhost:9092**: Host makineden erişim
 - Bu setup, hem internal hem external client'ların erişimini sağlar
 
 #### **Replication Yapılandırması**
+
 ```yaml
 KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 ```
+
 - Single node cluster için replication factor 1
 - Production'da minimum 3 broker ve RF=3 önerilir
 
@@ -237,8 +249,9 @@ Topic: user-events
 ```
 
 **Yapılan İşlemler**:
+
 - **Partitioning**: Yük dağılımı için mesajlar farklı partition'lara dağıtılır
-- **Ordering**: Her partition içinde mesaj sırası korunur  
+- **Ordering**: Her partition içinde mesaj sırası korunur
 - **Parallelism**: Farklı partition'lar paralel olarak okunabilir
 
 ### 2. Consumer Group Mekanizması
@@ -246,21 +259,22 @@ Topic: user-events
 ```mermaid
 graph TD
     A[Topic: orders] --> B[Partition 0]
-    A --> C[Partition 1] 
+    A --> C[Partition 1]
     A --> D[Partition 2]
-    
+
     B --> E[Consumer 1]
     C --> F[Consumer 2]
     D --> G[Consumer 3]
-    
+
     E --> H[Consumer Group: order-processors]
     F --> H
     G --> H
-    
+
     style H fill:#e1f5fe
 ```
 
 **Yapılan İşlemler**:
+
 - **Load Balancing**: Her partition yalnızca bir consumer tarafından okunur
 - **Fault Tolerance**: Bir consumer fail olursa, partition başka consumer'a assign edilir
 - **Scalability**: Consumer sayısı artırılarak throughput artırılabilir
@@ -275,6 +289,7 @@ Partition 0: [0][1][2][3][4][5][6][7][8][9]
 ```
 
 **Yapılan İşlemler**:
+
 - **Position Tracking**: Her consumer kendi offset'ini saklar
 - **Replay Capability**: Eski offset'e reset yaparak mesajlar tekrar okunabilir
 - **Commit Strategies**: Auto/manual commit ile offset management
@@ -292,7 +307,7 @@ docker exec -it kafka1 kafka-topics.sh \
     --partitions 3 \
     --replication-factor 1
 
-# Topic'leri listeleme  
+# Topic'leri listeleme
 docker exec -it kafka1 kafka-topics.sh \
     --list \
     --bootstrap-server localhost:9092
@@ -305,6 +320,7 @@ docker exec -it kafka1 kafka-topics.sh \
 ```
 
 **Yapılan İşlemler**:
+
 - **Topic Creation**: Belirtilen partition ve replication factor ile topic oluşturur
 - **Metadata Retrieval**: Topic yapılandırması ve partition dağılımını gösterir
 
@@ -325,6 +341,7 @@ docker exec -it kafka1 kafka-console-producer.sh \
 ```
 
 **Yapılan İşlemler**:
+
 - **Message Publishing**: Topic'e mesaj gönderir
 - **Key-based Partitioning**: Key ile partition selection yapılır
 
@@ -351,6 +368,7 @@ docker exec -it kafka1 kafka-consumer-groups.sh \
 ```
 
 **Yapılan İşlemler**:
+
 - **Message Consumption**: Topic'ten mesaj okur
 - **Group Management**: Consumer group üyeliği ve offset tracking
 - **Lag Monitoring**: Consumer group'un ne kadar geride olduğunu gösterir
@@ -387,6 +405,7 @@ docker exec -it kafka1 kafka-consumer-groups.sh \
 ```
 
 **Yapılan İşlemler**:
+
 - **Health Monitoring**: Broker ve topic sağlık durumu kontrolü
 - **Performance Metrics**: Throughput, latency ve lag metrikleri
 - **Resource Usage**: Disk, memory ve network kullanımı
@@ -394,7 +413,9 @@ docker exec -it kafka1 kafka-consumer-groups.sh \
 ## 🎯 Hands-on Lab: İlk Kafka Uygulaması
 
 ### Lab Hedefi
+
 Basit bir chat room sistemi oluşturacağız:
+
 - Kullanıcılar mesaj gönderebilecek (Producer)
 - Tüm kullanıcılar mesajları görebilecek (Consumer)
 
@@ -442,11 +463,12 @@ docker exec -it kafka1 kafka-console-producer.sh \
 
 ```
 alice > Merhaba herkese!
-bob > Selam Alice, nasılsın?  
+bob > Selam Alice, nasılsın?
 charlie > İyi günler!
 ```
 
 **Yapılan İşlemler**:
+
 - **Real-time Messaging**: Mesajlar gerçek zamanlı olarak iletilir
 - **Message Ordering**: Tek partition kullandığımız için mesaj sırası korunur
 - **Key-Value Structure**: Kullanıcı adı key, mesaj value olarak saklanır
@@ -454,13 +476,15 @@ charlie > İyi günler!
 ## ✅ Checklist - Kafka Temelleri
 
 ### Kavramsal Anlayış
+
 - [ ] Event streaming vs traditional messaging farkını anlıyorum
 - [ ] Topic, Partition, Broker kavramlarını açıklayabiliyorum
 - [ ] Consumer Group mekanizmasını anlıyorum
 - [ ] Offset management nasıl çalışıyor biliyorum
 - [ ] Replication ve fault tolerance mekanizmalarını kavradım
 
-### Pratik Beceriler  
+### Pratik Beceriler
+
 - [ ] Docker Compose ile Kafka cluster kurabiliyorum
 - [ ] Kafka CLI araçlarını kullanabiliyorum
 - [ ] Topic oluşturup yönetebiliyorum
@@ -468,6 +492,7 @@ charlie > İyi günler!
 - [ ] Consumer group durumunu izleyebiliyorum
 
 ### Operasyonel Beceriler
+
 - [ ] Kafka cluster'ın sağlık durumunu kontrol edebiliyorum
 - [ ] Topic ve partition metriklerini okuyabiliyorum
 - [ ] Consumer lag'i anlayabiliyorum
@@ -476,6 +501,7 @@ charlie > İyi günler!
 ## 🚫 Common Mistakes ve Çözümleri
 
 ### 1. **Port Çakışması**
+
 ```bash
 # Hata: Port 9092 already in use
 # Çözüm: Çalışan Kafka process'lerini kontrol et
@@ -484,6 +510,7 @@ docker stop $(docker ps -q --filter "name=kafka")
 ```
 
 ### 2. **Yanlış Network Yapılandırması**
+
 ```yaml
 # YANLIŞ: Sadece internal listener
 KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:29092
@@ -493,6 +520,7 @@ KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://localhost:
 ```
 
 ### 3. **Yetersiz Partition Sayısı**
+
 ```bash
 # Partition sayısını artırma (azaltılamaz!)
 docker exec -it kafka1 kafka-topics.sh \
@@ -503,6 +531,7 @@ docker exec -it kafka1 kafka-topics.sh \
 ```
 
 ### 4. **Consumer Group Stuck**
+
 ```bash
 # Consumer group reset etme
 docker exec -it kafka1 kafka-consumer-groups.sh \
@@ -519,10 +548,12 @@ docker exec -it kafka1 kafka-consumer-groups.sh \
 ### Lab Çözümü İpuçları
 
 1. **Chat mesajları gözükmüyor**:
+
    - Consumer'ı `--from-beginning` ile başlattığınızdan emin olun
    - Topic adının doğru olduğunu kontrol edin
 
 2. **Key-value formatı çalışmıyor**:
+
    - Producer'da `parse.key=true` ve `key.separator=:` property'lerini kullanın
    - Consumer'da `print.key=true` property'sini kullanın
 
@@ -533,12 +564,15 @@ docker exec -it kafka1 kafka-consumer-groups.sh \
 ## 🎓 Değerlendirme Soruları
 
 1. **Kafka'da message ordering nasıl garanti edilir?**
+
    - Cevap: Partition seviyesinde, aynı partition içindeki mesajlar sıralıdır
 
 2. **Neden Consumer Group kullanırız?**
+
    - Cevap: Load balancing, fault tolerance ve scalability için
 
 3. **Offset commit edilmezse ne olur?**
+
    - Cevap: Consumer restart olduğunda mesajlar tekrar okunur
 
 4. **Partition sayısı nasıl belirlenmeli?**
@@ -549,7 +583,7 @@ docker exec -it kafka1 kafka-consumer-groups.sh \
 Bu bölümü tamamladıktan sonra:
 
 1. **[Producer & Consumer](02-producer-consumer.md)** - Programmatic API kullanımı
-2. **[Topic & Partition Management](03-topic-partition.md)** - İleri seviye topic yönetimi  
+2. **[Topic & Partition Management](03-topic-partition.md)** - İleri seviye topic yönetimi
 3. **Hands-on Practice** - Kendi producer/consumer uygulamanızı yazın
 
 ## 📚 Ek Kaynaklar
