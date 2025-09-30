@@ -81,13 +81,15 @@ start-rabbitmq: ## Start RabbitMQ only
 
 start-redis: ## Start Redis only
 	$(call print_info,"Starting Redis...")
-	@chmod +x setup.sh
-	@./setup.sh start-redis
+	@chmod +x scripts/setup_redis.sh
+	@./scripts/setup_redis.sh
+	$(call print_success,"Redis started")
 
 start-elasticsearch: ## Start Elasticsearch only
 	$(call print_info,"Starting Elasticsearch...")
-	@chmod +x setup.sh
-	@./setup.sh start-elasticsearch
+	@chmod +x scripts/setup_elasticsearch.sh
+	@./scripts/setup_elasticsearch.sh
+	$(call print_success,"Elasticsearch started")
 
 stop: ## Stop all services
 	$(call print_info,"Stopping all services...")
@@ -137,15 +139,18 @@ test-kafka: ## Test Kafka functionality
 
 test-rabbitmq: ## Test RabbitMQ functionality
 	$(call print_info,"Testing RabbitMQ...")
-	@echo "RabbitMQ tests will be added soon..."
+	@cd $(EXAMPLES_DIR)/rabbitmq/python && python simple_producer.py & sleep 2 && python simple_consumer.py &
+	$(call print_success,"RabbitMQ tests completed")
 
 test-redis: ## Test Redis functionality
 	$(call print_info,"Testing Redis...")
-	@echo "Redis tests will be added soon..."
+	@cd $(EXAMPLES_DIR)/redis/python && python basic_operations.py
+	$(call print_success,"Redis tests completed")
 
 test-elasticsearch: ## Test Elasticsearch functionality
 	$(call print_info,"Testing Elasticsearch...")
-	@echo "Elasticsearch tests will be added soon..."
+	@cd $(EXAMPLES_DIR)/elasticsearch/python && python basic_operations.py
+	$(call print_success,"Elasticsearch tests completed")
 
 # Performance testing
 perf-test: ## Run performance tests
@@ -171,10 +176,13 @@ logs-rabbitmq: ## Show RabbitMQ logs
 	@docker logs -f rabbitmq
 
 logs-redis: ## Show Redis logs
-	@docker logs -f redis
+	@docker logs -f redis-server
 
 logs-elasticsearch: ## Show Elasticsearch logs
 	@docker logs -f elasticsearch
+
+logs-kibana: ## Show Kibana logs
+	@docker logs -f kibana
 
 monitor: ## Start monitoring stack (Prometheus + Grafana)
 	$(call print_info,"Starting monitoring stack...")
@@ -237,6 +245,36 @@ run-java-consumer: ## Run Java consumer
 	$(call print_info,"Running Java consumer...")
 	@cd $(EXAMPLES_DIR)/kafka/java && mvn exec:java -Dexec.mainClass="SimpleConsumer"
 
+run-redis-demo: ## Run Redis demo
+	$(call print_info,"Running Redis demo...")
+	@cd $(EXAMPLES_DIR)/redis/python && python basic_operations.py
+
+run-redis-lab: ## Run Redis user profile lab
+	$(call print_info,"Running Redis user profile lab...")
+	@cd $(EXAMPLES_DIR)/redis/python && python user_profile_lab.py
+
+run-redis-pubsub: ## Run Redis Pub/Sub demo
+	$(call print_info,"Running Redis Pub/Sub demo...")
+	@cd $(EXAMPLES_DIR)/redis/python && python pubsub_examples.py
+
+run-redis-chat: ## Run Redis chat application
+	$(call print_info,"Running Redis chat application...")
+	@echo "Usage: python chat_application.py <room_name> <username>"
+	@echo "Example: python chat_application.py general alice"
+	@cd $(EXAMPLES_DIR)/redis/python && python chat_application.py general demo_user
+
+run-elasticsearch-demo: ## Run Elasticsearch demo
+	$(call print_info,"Running Elasticsearch demo...")
+	@cd $(EXAMPLES_DIR)/elasticsearch/python && python basic_operations.py
+
+run-product-search-lab: ## Run product search lab
+	$(call print_info,"Running product search lab...")
+	@cd $(EXAMPLES_DIR)/elasticsearch/python && python product_search_lab.py
+
+run-elasticsearch-crud: ## Run Elasticsearch advanced CRUD demo
+	$(call print_info,"Running Elasticsearch advanced CRUD demo...")
+	@cd $(EXAMPLES_DIR)/elasticsearch/python && python advanced_crud_operations.py
+
 # ==============================================================================
 # DOCUMENTATION
 # ==============================================================================
@@ -277,7 +315,7 @@ exec-rabbitmq: ## Execute shell in RabbitMQ container
 	@docker exec -it rabbitmq /bin/bash
 
 exec-redis: ## Execute Redis CLI
-	@docker exec -it redis redis-cli -a redis123
+	@docker exec -it redis-server redis-cli -a redis123
 
 exec-elasticsearch: ## Execute shell in Elasticsearch container
 	@docker exec -it elasticsearch /bin/bash
@@ -289,7 +327,7 @@ health: ## Check health of all services
 	@echo "RabbitMQ:"
 	@docker exec rabbitmq rabbitmq-diagnostics ping > /dev/null 2>&1 && echo "  ✅ Healthy" || echo "  ❌ Unhealthy"
 	@echo "Redis:"
-	@docker exec redis redis-cli --no-auth-warning -a redis123 ping > /dev/null 2>&1 && echo "  ✅ Healthy" || echo "  ❌ Unhealthy"
+	@docker exec redis-server redis-cli --no-auth-warning -a redis123 ping > /dev/null 2>&1 && echo "  ✅ Healthy" || echo "  ❌ Unhealthy"
 	@echo "Elasticsearch:"
 	@curl -s http://localhost:9200/_cluster/health > /dev/null 2>&1 && echo "  ✅ Healthy" || echo "  ❌ Unhealthy"
 
@@ -356,7 +394,9 @@ quick-start: setup dev-start ## Quick start everything
 	@echo -e "$(YELLOW)📖 Next steps:$(NC)"
 	@echo "  1. Check service status: make status"
 	@echo "  2. Run examples: make run-producer"
-	@echo "  3. View documentation: open docs/README.md"
+	@echo "  3. Try Redis Pub/Sub: make run-redis-pubsub"
+	@echo "  4. Try Elasticsearch CRUD: make run-elasticsearch-crud"
+	@echo "  5. View documentation: open docs/README.md"
 
 # ==============================================================================
 # TROUBLESHOOTING

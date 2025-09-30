@@ -94,6 +94,21 @@ python chat_consumer.py bob general
 # RabbitMQ performance test
 ./scripts/rabbitmq_manager.sh performance 1000 3
 
+# Redis test
+make run-redis-demo
+
+# Redis Pub/Sub chat uygulaması test
+make run-redis-chat
+
+# Redis Pub/Sub demo
+make run-redis-pubsub
+
+# Elasticsearch test
+make run-elasticsearch-demo
+
+# Elasticsearch advanced CRUD
+make run-elasticsearch-crud
+
 # Tüm servislerin durumunu kontrol et
 make health
 ```
@@ -117,26 +132,34 @@ Servisler başladıktan sonra bu adreslere erişebilirsiniz:
 - [x] **Kafka Producer/Consumer** - API kullanımı ve örnekler
 - [x] **Kafka Topic Management** - İleri seviye yönetim
 - [x] **RabbitMQ Fundamentals** - Temel kavramlar ve kurulum
+- [x] **RabbitMQ Exchange Patterns** - Direct, Topic, Fanout, Headers
+- [x] **RabbitMQ Advanced Features** - Dead Letter Queues, TTL, Priority
 - [x] **RabbitMQ Chat Application** - Gerçek dünya örneği
+- [x] **Redis Fundamentals** - Temel kavramlar, data types, kurulum
+- [x] **Redis Pub/Sub System** - Real-time messaging, chat uygulaması
+- [x] **Redis Transactions** - MULTI/EXEC, Lua scripting, optimistic locking
+- [x] **Elasticsearch Fundamentals** - Temel kavramlar, REST API, kurulum
+- [x] **Elasticsearch Advanced CRUD** - Document lifecycle, bulk operations
 - [x] **Setup & Management Scripts** - Otomatik kurulum ve yönetim
 
 ### 🚧 Devam Eden Bölümler
 
-- [ ] **RabbitMQ Exchange Patterns** - Direct, Topic, Fanout, Headers
-- [ ] **RabbitMQ Advanced Features** - Dead Letter Queues, TTL, Clustering
-- [ ] **Redis Fundamentals** - Data structures ve temel operasyonlar
-- [ ] **Redis Advanced** - Pub/Sub, Clustering, Persistence
-- [ ] **Elasticsearch Fundamentals** - Indexing ve Search
-- [ ] **Elasticsearch Advanced** - Aggregations, Analytics
+- [x] **Redis Pub/Sub** - Real-time messaging sistemi
+- [x] **Elasticsearch Advanced CRUD** - Detaylı document işlemleri
+- [ ] **Redis Advanced** - Clustering, Persistence, Streams
+- [ ] **Elasticsearch Search Queries** - Complex queries ve aggregations
+- [ ] **All Services Integration** - Tüm servislerin bir arada kullanımı
+- [ ] **Production Deployment** - Kubernetes, monitoring, security
+- [ ] **Performance Optimization** - Tuning ve best practices
 
-### 📈 Toplam İlerleme: ~25%
+### 📈 Toplam İlerleme: ~75%
 
 **Estimasyon:**
 
 - Kafka: %80 tamamlandı
-- RabbitMQ: %30 tamamlandı
-- Redis: %0 başlanmadı
-- Elasticsearch: %0 başlanmadı
+- RabbitMQ: %70 tamamlandı
+- Redis: %60 tamamlandı
+- Elasticsearch: %55 tamamlandı
 
 ## �🛠️ Gereksinimler
 
