@@ -31,22 +31,114 @@ Bu repository, **Kafka**, **RabbitMQ**, **Redis** ve **Elasticsearch** teknoloji
 
 ## 🚀 Hızlı Başlangıç
 
-1. Repository'yi klonlayın:
+### 1. Repository Setup
 
 ```bash
 git clone <repository-url>
 cd KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH
 ```
 
-2. [Roadmap](docs/00-roadmap.md) dosyasını okuyarak öğrenme planınızı oluşturun
+### 2. Otomatik Kurulum
 
-3. İlgilendiğiniz teknoloji bölümünden başlayın:
-   - [Kafka](docs/01-kafka/README.md)
-   - [RabbitMQ](docs/02-rabbitmq/README.md)
-   - [Redis](docs/03-redis/README.md)
-   - [Elasticsearch](docs/04-elasticsearch/README.md)
+```bash
+# Tüm servisleri başlat
+chmod +x setup.sh
+./setup.sh setup
 
-## 🛠️ Gereksinimler
+# Veya Makefile kullan
+make setup
+```
+
+### 3. Servisleri Başlatma
+
+```bash
+# Tüm servisleri başlat
+make start-all
+
+# Sadece belirli bir servis
+make start-kafka      # Kafka cluster
+make start-rabbitmq   # RabbitMQ
+make start-redis      # Redis
+make start-elasticsearch # Elasticsearch
+```
+
+### 4. Servis Durumunu Kontrol Et
+
+```bash
+make status
+# veya
+./setup.sh status
+```
+
+### 5. Öğrenme Yol Haritası
+
+1. [Roadmap](docs/00-roadmap.md) dosyasını okuyarak öğrenme planınızı oluşturun
+
+2. İlgilendiğiniz teknoloji bölümünden başlayın:
+   - [Kafka](docs/01-kafka/01-temeller.md) - Event Streaming Platform
+   - [RabbitMQ](docs/02-rabbitmq/01-temeller.md) - Message Broker
+   - [Redis](docs/03-redis/01-temeller.md) - In-Memory Data Store
+   - [Elasticsearch](docs/04-elasticsearch/01-temeller.md) - Search & Analytics Engine
+
+### 6. Hızlı Test
+
+```bash
+# Kafka test
+make test-kafka
+
+# RabbitMQ chat uygulaması test
+cd examples/rabbitmq/python
+python chat_producer.py alice &
+python chat_consumer.py bob general
+
+# RabbitMQ performance test
+./scripts/rabbitmq_manager.sh performance 1000 3
+
+# Tüm servislerin durumunu kontrol et
+make health
+```
+
+### 7. Management UI'lar
+
+Servisler başladıktan sonra bu adreslere erişebilirsiniz:
+
+- **Kafka UI**: http://localhost:8080
+- **RabbitMQ Management**: http://localhost:15672 (admin/admin123)
+- **Redis Commander**: http://localhost:8081
+- **Elasticsearch**: http://localhost:9200
+- **Kibana**: http://localhost:5601
+
+## � Progress Durumu
+
+### ✅ Tamamlanan Bölümler
+
+- [x] **Project Structure** - Proje iskelet yapısı
+- [x] **Kafka Fundamentals** - Temel kavramlar ve kurulum
+- [x] **Kafka Producer/Consumer** - API kullanımı ve örnekler
+- [x] **Kafka Topic Management** - İleri seviye yönetim
+- [x] **RabbitMQ Fundamentals** - Temel kavramlar ve kurulum
+- [x] **RabbitMQ Chat Application** - Gerçek dünya örneği
+- [x] **Setup & Management Scripts** - Otomatik kurulum ve yönetim
+
+### 🚧 Devam Eden Bölümler
+
+- [ ] **RabbitMQ Exchange Patterns** - Direct, Topic, Fanout, Headers
+- [ ] **RabbitMQ Advanced Features** - Dead Letter Queues, TTL, Clustering
+- [ ] **Redis Fundamentals** - Data structures ve temel operasyonlar
+- [ ] **Redis Advanced** - Pub/Sub, Clustering, Persistence
+- [ ] **Elasticsearch Fundamentals** - Indexing ve Search
+- [ ] **Elasticsearch Advanced** - Aggregations, Analytics
+
+### 📈 Toplam İlerleme: ~25%
+
+**Estimasyon:**
+
+- Kafka: %80 tamamlandı
+- RabbitMQ: %30 tamamlandı
+- Redis: %0 başlanmadı
+- Elasticsearch: %0 başlanmadı
+
+## �🛠️ Gereksinimler
 
 - Docker ve Docker Compose
 - Node.js 16+ (JavaScript örnekleri için)
