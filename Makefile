@@ -263,6 +263,18 @@ run-redis-chat: ## Run Redis chat application
 	@echo "Example: python chat_application.py general alice"
 	@cd $(EXAMPLES_DIR)/redis/python && python chat_application.py general demo_user
 
+run-redis-cluster: ## Run Redis cluster management demo
+	$(call print_info,"Running Redis cluster demo...")
+	@cd $(EXAMPLES_DIR)/redis/python && python cluster_management.py
+
+redis-cluster-health: ## Check Redis cluster health
+	$(call print_info,"Checking Redis cluster health...")
+	@redis-cli -p 7001 cluster nodes
+
+redis-cluster-info: ## Show Redis cluster information
+	$(call print_info,"Redis cluster information...")
+	@redis-cli -p 7001 cluster info
+
 run-elasticsearch-demo: ## Run Elasticsearch demo
 	$(call print_info,"Running Elasticsearch demo...")
 	@cd $(EXAMPLES_DIR)/elasticsearch/python && python basic_operations.py
@@ -274,6 +286,26 @@ run-product-search-lab: ## Run product search lab
 run-elasticsearch-crud: ## Run Elasticsearch advanced CRUD demo
 	$(call print_info,"Running Elasticsearch advanced CRUD demo...")
 	@cd $(EXAMPLES_DIR)/elasticsearch/python && python advanced_crud_operations.py
+
+run-elasticsearch-search: ## Run Elasticsearch search queries demo
+	$(call print_info,"Running Elasticsearch search queries demo...")
+	@cd $(EXAMPLES_DIR)/elasticsearch/python && python advanced_search_queries.py
+
+run-elasticsearch-aggregations: ## Run Elasticsearch aggregations demo
+	$(call print_info,"Running Elasticsearch aggregations demo...")
+	@cd $(EXAMPLES_DIR)/elasticsearch/python && python advanced_aggregations.py
+
+elasticsearch-health: ## Check Elasticsearch cluster health
+	$(call print_info,"Checking Elasticsearch cluster health...")
+	@curl -s "http://localhost:9200/_cluster/health?pretty"
+
+elasticsearch-indices: ## List Elasticsearch indices
+	$(call print_info,"Listing Elasticsearch indices...")
+	@curl -s "http://localhost:9200/_cat/indices?v"
+
+elasticsearch-nodes: ## Check Elasticsearch nodes
+	$(call print_info,"Checking Elasticsearch nodes...")
+	@curl -s "http://localhost:9200/_cat/nodes?v"
 
 # ==============================================================================
 # DOCUMENTATION
