@@ -307,6 +307,27 @@ elasticsearch-nodes: ## Check Elasticsearch nodes
 	$(call print_info,"Checking Elasticsearch nodes...")
 	@curl -s "http://localhost:9200/_cat/nodes?v"
 
+## Integration Examples
+run-integration-demo: ## Run complete integration platform demo
+	$(call print_info,"Running event-driven e-commerce integration demo...")
+	@cd $(EXAMPLES_DIR)/integration/python && python ecommerce_platform.py
+
+start-monitoring-dashboard: ## Start comprehensive monitoring dashboard
+	$(call print_info,"Starting comprehensive monitoring dashboard...")
+	@cd $(EXAMPLES_DIR)/integration/python && python monitoring_dashboard.py
+
+run-performance-benchmark: ## Run performance benchmark suite
+	$(call print_info,"Running performance benchmark suite...")
+	@cd $(EXAMPLES_DIR)/integration/python && python -c "from monitoring_dashboard import PerformanceBenchmarkSuite; suite = PerformanceBenchmarkSuite(); suite.run_full_benchmark()"
+
+optimize-performance: ## Run automated performance optimization
+	$(call print_info,"Running automated performance optimization...")
+	@cd $(EXAMPLES_DIR)/integration/python && python -c "from monitoring_dashboard import AutomatedPerformanceOptimizer, IntegratedPerformanceMonitor; monitor = IntegratedPerformanceMonitor(); optimizer = AutomatedPerformanceOptimizer(monitor); result = optimizer.run_optimization_cycle(); print('Optimization completed!')"
+
+integration-status: ## Check integration platform status
+	$(call print_info,"Checking technology availability...")
+	@cd $(EXAMPLES_DIR)/integration/python && python -c "from ecommerce_platform import TechnologyChecker; tech = TechnologyChecker.get_available_technologies(); [print(f'   {\'\u2705\' if available else \'\u274c\'} {name.upper()}: {\'Available\' if available else \'Not available\'}') for name, available in tech.items()]; print(f'\n📊 Available: {sum(tech.values())}/4 technologies')"
+
 # ==============================================================================
 # DOCUMENTATION
 # ==============================================================================
