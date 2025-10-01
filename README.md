@@ -5,11 +5,7 @@
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue?logo=docker)](deployment/docker-compose/)
 
 Bu repository, **Kafka**, **RabbitMQ**, **Redis** ve **Elasticsearch** teknolojileri için temelden ileri seviyeye kadar ilerleyen kapsamlı bir eğitim dokümantasyonudur.
-
-## 👨‍💻 Proje Sahibi
-
-**Ömer Ada** - Distributed Systems & Message Queue Technologies Uzmanı
-
+  
 - GitHub: [@omerada](https://github.com/omerada)
 - Email: omer.ada@example.com
 
